@@ -21,6 +21,11 @@ class PairsStrategy:
     def in_position(self):
 
         self.balance = self.account.balance
+        self.logger.info(
+            "checked balance, btc:{}, eth:{}".format(
+                self.balance["btc_balance"], self.balance["eth_balance"]
+            )
+        )
 
         if (
             float(self.balance["btc_balance"]) < 1e-5

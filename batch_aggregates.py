@@ -58,5 +58,7 @@ if __name__ == "__main__":
 
     aggs = calc_aggregates(data, days)
 
-    with open("aggregates.json", "w") as f:
+    dir = Path(__file__).parent
+
+    with open(dir / "aggregates.json", "w") as f:
         json.dump(aggs, f)

@@ -1,6 +1,5 @@
 import logging
 
-from requests.api import get
 from account import Account
 
 

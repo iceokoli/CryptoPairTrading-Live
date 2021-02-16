@@ -90,8 +90,9 @@ def on_message(ws, message):
         if eth_mid and btc_mid and cross_mid:
             s = strat.calc_spread(btc_mid, eth_mid)
             strat.evaluate_action(s, cross_mid)
-            logger.info("waiting 1 minute")
+            logger.info("waiting 5 minute")
             time.sleep(60 * 5)
+            btc_mid, eth_mid, cross_mid = float(), float(), float()
 
     except Exception as error:
         logger.info(error)

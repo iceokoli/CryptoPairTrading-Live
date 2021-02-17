@@ -4,6 +4,7 @@ import ssl
 import logging
 import datetime
 import os
+from pathlib import Path
 
 import websocket
 
@@ -11,11 +12,13 @@ from account import Account
 from strategy import PairsStrategy
 from utility import estimate_mid_price
 
+dir = str(Path(__name__).parent)
+
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s: - %(message)s",
     level=logging.INFO,
     filemode="a",
-    filename=f"logging/logging-{datetime.datetime.now().date()}.txt",
+    filename=f"{dir}/logging/logging-{datetime.datetime.now().date()}.txt",
 )
 
 logger = logging.getLogger(__name__)

@@ -12,7 +12,7 @@ from account import Account
 from strategy import PairsStrategy
 from utility import estimate_mid_price
 
-dir = str(Path(__name__).parent)
+dir = str(Path(__file__).parent)
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s: - %(message)s",
@@ -31,7 +31,7 @@ auth = {
     "key": os.getenv("BSKEY"),
 }
 
-with open("aggregates.json", "r") as f:
+with open(f"{dir}/aggregates.json", "r") as f:
     agg = json.load(f)
 
 acc = Account(auth, client_id, logger)

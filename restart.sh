@@ -19,7 +19,7 @@ check_process(){
 
 
 echo 'begin checking...'
-check_process "python3 run.py" # the thread name
+check_process "python3 CryptoPairTrading-Live/run.py" # the thread name
 CHECK_RET = $?
 if [ $CHECK_RET -eq 0 ]; # none exist
 then

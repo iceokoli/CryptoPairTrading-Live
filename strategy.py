@@ -8,6 +8,7 @@ class PairsStrategy:
         self.cycle = 0
         self.logger = logger
         self.balance = 0
+        self.execute = 0
 
     def calc_spread(self, btc_price, eth_price):
 
@@ -19,8 +20,9 @@ class PairsStrategy:
 
     @property
     def in_position(self):
-
-        self.balance = self.account.balance
+        if self.cycle == 1 or self.execute == 1:
+            self.logger.info("Retrieving Balance ....")
+            self.balance = self.account.balance
         self.logger.info(
             "checked balance, btc:{}, eth:{}".format(
                 self.balance["btc_balance"], self.balance["eth_balance"]
@@ -45,20 +47,28 @@ class PairsStrategy:
                     amount = round(float(self.balance["eth_balance"]) / 2, 8)
                     txt = self.account.order("sell", "ethbtc", amount)
                     self.logger.info(txt)
+                    self.execute = 1
                 elif self.spread_prev < -1:
                     amount = round(float(self.balance["btc_balance"]) / 2, 8)
                     txt = self.account.order("buy", "ethbtc", amount)
                     self.logger.info(txt)
+                    self.execute = 1
+                else:
+                    self.logger.info("Do nothing")
+                    self.execute = 0
         else:
             if spread > self.enter:
                 amount = self.balance["btc_balance"]
                 txt = self.account.order("buy", "ethbtc", amount)
                 self.logger.info(txt)
                 self.spread_prev = spread
+                self.execute = 1
             elif spread < -self.enter:
                 amount = self.balance["eth_balance"]
                 txt = self.account.order("sell", "ethbtc", amount)
                 self.logger.info(txt)
                 self.spread_prev = spread
+                self.execute = 1
             else:
                 self.logger.info("Do nothing")
+                self.execute = 0

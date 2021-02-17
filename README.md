@@ -18,12 +18,12 @@ Handled by cron jobs.
     30 0 * * * python3 batch_aggreagates.py
     ```
 
-- At 01:00 the strategy is kicked off
+- At 01:30 the strategy is kicked off
     ```zsh
     30 1 * * * python3 run.py
     ```
 
-- At 23:45 the strategy is stopped
+- At 23:50 the strategy is stopped
     ```zsh
-    30 1 * * * sudo pkill python
+    50 23 * * * sudo pkill python
     ```

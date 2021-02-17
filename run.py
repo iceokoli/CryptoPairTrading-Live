@@ -17,8 +17,8 @@ dir = str(Path(__file__).parent)
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s: - %(message)s",
     level=logging.INFO,
-    filemode="a",
-    filename=f"{dir}/logging/logging-{datetime.datetime.now().date()}.txt",
+    # filemode="a",
+    # filename=f"{dir}/logging/logging-{datetime.datetime.now().date()}.txt",
 )
 
 logger = logging.getLogger(__name__)
@@ -94,10 +94,12 @@ def on_message(ws, message):
             s = strat.calc_spread(btc_mid, eth_mid)
             strat.evaluate_action(s, cross_mid)
             btc_mid, eth_mid, cross_mid = float(), float(), float()
+            time.sleep(10)
 
     except Exception as error:
         logger.info(error)
         ws.close()
+
 
 def on_error(ws, error):
     logger.info(error)

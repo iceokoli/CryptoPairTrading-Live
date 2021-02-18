@@ -53,6 +53,8 @@ class PairsStrategy:
 
     def evaluate_action(self, spread):
 
+        self.logger.info("Spread: {:.2f}".format(spread))
+
         if self.in_position:
             if (abs(spread) < self.exit) or self.reversed(spread):
                 if int(self.balance["btc_balance"]) == 0:
@@ -80,5 +82,5 @@ class PairsStrategy:
                 self.logger.info(txt)
                 self.execute = 1
             else:
-                self.logger.info("Do nothing")
+                self.logger.info("Do nothing, spread: {:.2f}".format(spread))
                 self.execute = 0

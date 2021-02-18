@@ -17,15 +17,15 @@ dir = str(Path(__file__).parent)
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s: - %(message)s",
     level=logging.INFO,
-    # filemode="a",
-    # filename=f"{dir}/logging/logging-{datetime.datetime.now().date()}.txt",
+    filemode="a",
+    filename=f"{dir}/logging/logging-{datetime.datetime.now().date()}.txt",
 )
 
 logger = logging.getLogger(__name__)
 
 btc_mid, eth_mid = float(), float()
 
-client_id = os.getenv("BISID")
+client_id = os.getenv("BSID")
 auth = {
     "secret": bytes(os.getenv("BSSECRET"), "utf-8"),
     "key": os.getenv("BSKEY"),

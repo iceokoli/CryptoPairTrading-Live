@@ -23,9 +23,9 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-btc_mid, eth_mid, cross_mid = float(), float(), float()
+btc_mid, eth_mid = float(), float()
 
-client_id = "sczk3503"
+client_id = os.getenv("BISID")
 auth = {
     "secret": bytes(os.getenv("BSSECRET"), "utf-8"),
     "key": os.getenv("BSKEY"),
@@ -43,14 +43,14 @@ strat = PairsStrategy(
 
 def store_data(mid, channel):
 
-    global btc_mid, eth_mid, cross_mid
+    global btc_mid, eth_mid
 
     if channel == "order_book_btcgbp":
         btc_mid = mid
     elif channel == "order_book_ethgbp":
         eth_mid = mid
-    elif channel == "order_book_ethbtc":
-        cross_mid = mid
+    # elif channel == "order_book_ethbtc":
+    #     cross_mid = mid
 
 
 def on_open(ws):
@@ -60,12 +60,11 @@ def on_open(ws):
     eth_sub = json.dumps(
         {"event": "bts:subscribe", "data": {"channel": "order_book_ethgbp"}}
     )
-    cross_sub = json.dumps(
-        {"event": "bts:subscribe", "data": {"channel": "order_book_ethbtc"}}
-    )
+    # cross_sub = json.dumps(
+    #     {"event": "bts:subscribe", "data": {"channel": "order_book_ethbtc"}}
+    # )
     ws.send(btc_sub)
     ws.send(eth_sub)
-    ws.send(cross_sub)
     logger.info("### subscribed ###")
 
 
@@ -76,7 +75,7 @@ def on_close(ws):
 
 def on_message(ws, message):
 
-    global btc_mid, eth_mid, cross_mid
+    global btc_mid, eth_mid
 
     try:
         data = json.loads(message)
@@ -90,11 +89,10 @@ def on_message(ws, message):
         mid = estimate_mid_price(data["data"])
         store_data(mid, channel)
 
-        if eth_mid and btc_mid and cross_mid:
+        if eth_mid and btc_mid:
             s = strat.calc_spread(btc_mid, eth_mid)
-            strat.evaluate_action(s, cross_mid)
-            btc_mid, eth_mid, cross_mid = float(), float(), float()
-            time.sleep(10)
+            strat.evaluate_action(s)
+            btc_mid, eth_mid = float(), float()
 
     except Exception as error:
         logger.info(error)

@@ -51,7 +51,7 @@ class PairsStrategy:
 
             return False
 
-    def evaluate_action(self, spread, price):
+    def evaluate_action(self, spread):
 
         if self.in_position:
             if (abs(spread) < self.exit) or self.reversed(spread):

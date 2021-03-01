@@ -39,7 +39,7 @@ def calc_aggregates(data, days):
     return {
         "mean": spread.mean(),
         "std": spread.std(),
-        "beta": rolling_beta.mean(),
+        "beta": rolling_beta.iloc[-1],
     }
 
 

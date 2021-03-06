@@ -39,11 +39,11 @@ class PairsStrategy:
 
     def reversed(self, spread):
 
-        if self.balance["eth_balance"] == 0 and spread > self.enter:
+        if float(self.balance["eth_balance"]) == 0 and spread >= self.enter:
 
             return True
 
-        elif self.balance["btc_balance"] == 0 and spread < -self.enter:
+        elif float(self.balance["btc_balance"]) == 0 and spread <= -self.enter:
 
             return True
 
@@ -57,12 +57,12 @@ class PairsStrategy:
 
         if self.in_position:
             if (abs(spread) < self.exit) or self.reversed(spread):
-                if int(self.balance["btc_balance"]) == 0:
+                if float(self.balance["btc_balance"]) == 0:
                     amount = round(float(self.balance["eth_balance"]) / 2, 8)
                     txt = self.account.order("sell", "ethbtc", amount)
                     self.logger.info(txt)
                     self.execute = 1
-                elif int(self.balance["eth_balance"]) == 0:
+                elif float(self.balance["eth_balance"]) == 0:
                     amount = round(float(self.balance["btc_balance"]) / 2, 8)
                     txt = self.account.order("buy", "ethbtc", amount)
                     self.logger.info(txt)
@@ -71,12 +71,12 @@ class PairsStrategy:
                 self.logger.info("Do nothing")
                 self.execute = 0
         else:
-            if spread > self.enter:
+            if spread >= self.enter:
                 amount = self.balance["btc_balance"]
                 txt = self.account.order("buy", "ethbtc", amount)
                 self.logger.info(txt)
                 self.execute = 1
-            elif spread < -self.enter:
+            elif spread <= -self.enter:
                 amount = self.balance["eth_balance"]
                 txt = self.account.order("sell", "ethbtc", amount)
                 self.logger.info(txt)

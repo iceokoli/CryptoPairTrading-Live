@@ -19,10 +19,10 @@ class PairsStrategy:
         return norm_spread
 
     @property
-    def in_position(self):
+    async def in_position(self):
         if self.cycle == 1 or self.execute == 1:
             self.logger.info("Retrieving Balance ....")
-            self.balance = self.account.balance
+            self.balance = await self.account.balance
         self.logger.info(
             "checked balance, btc:{}, eth:{}".format(
                 self.balance["btc_balance"], self.balance["eth_balance"]
@@ -51,20 +51,20 @@ class PairsStrategy:
 
             return False
 
-    def evaluate_action(self, spread):
+    async def evaluate_action(self, spread):
 
         self.logger.info("Spread: {:.2f}".format(spread))
 
-        if self.in_position:
+        if await self.in_position:
             if (abs(spread) < self.exit) or self.reversed(spread):
                 if float(self.balance["btc_balance"]) == 0:
                     amount = round(float(self.balance["eth_balance"]) / 2, 8)
-                    txt = self.account.order("sell", "ethbtc", amount)
+                    txt = await self.account.order("sell", "ethbtc", amount)
                     self.logger.info(txt)
                     self.execute = 1
                 elif float(self.balance["eth_balance"]) == 0:
                     amount = round(float(self.balance["btc_balance"]) / 2, 8)
-                    txt = self.account.order("buy", "ethbtc", amount)
+                    txt = await self.account.order("buy", "ethbtc", amount)
                     self.logger.info(txt)
                     self.execute = 1
             else:
@@ -73,12 +73,12 @@ class PairsStrategy:
         else:
             if spread >= self.enter:
                 amount = self.balance["btc_balance"]
-                txt = self.account.order("buy", "ethbtc", amount)
+                txt = await self.account.order("buy", "ethbtc", amount)
                 self.logger.info(txt)
                 self.execute = 1
             elif spread <= -self.enter:
                 amount = self.balance["eth_balance"]
-                txt = self.account.order("sell", "ethbtc", amount)
+                txt = await self.account.order("sell", "ethbtc", amount)
                 self.logger.info(txt)
                 self.execute = 1
             else:

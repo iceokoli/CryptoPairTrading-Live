@@ -1,4 +1,4 @@
-import requests
+import aiohttp
 import hmac
 import hashlib
 import time
@@ -11,7 +11,7 @@ class Account:
         self.logger = logger
 
     @property
-    def balance(self):
+    async def balance(self):
         _url = "https://www.bitstamp.net/api/v2/balance/"
 
         nonce = int(time.time() * 1000)
@@ -25,13 +25,14 @@ class Account:
             .hexdigest()
             .upper(),
         )
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                _url,
+                data={"key": self.auth["key"], "signature": signature, "nonce": nonce},
+            ) as responce:
+                return await responce.json()
 
-        r = requests.post(
-            _url, data={"key": self.auth["key"], "signature": signature, "nonce": nonce}
-        )
-        return r.json()
-
-    def order(self, side, currency_pair, amount):
+    async def order(self, side, currency_pair, amount):
         _url = f"https://www.bitstamp.net/api/v2/{side}/instant/{currency_pair}/"
 
         nonce = int(time.time() * 1000)
@@ -46,25 +47,29 @@ class Account:
             .upper(),
         )
         if side == "buy":
-            r = requests.post(
-                _url,
-                data={
-                    "key": self.auth["key"],
-                    "signature": signature,
-                    "nonce": nonce,
-                    "amount": amount,
-                },
-            )
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    _url,
+                    data={
+                        "key": self.auth["key"],
+                        "signature": signature,
+                        "nonce": nonce,
+                        "amount": amount,
+                    },
+                ) as responce:
+                    result = await responce.json()
         elif side == "sell":
-            r = requests.post(
-                _url,
-                data={
-                    "key": self.auth["key"],
-                    "signature": signature,
-                    "nonce": nonce,
-                    "amount": amount,
-                    "amount_in_counter": False,
-                },
-            )
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    _url,
+                    data={
+                        "key": self.auth["key"],
+                        "signature": signature,
+                        "nonce": nonce,
+                        "amount": amount,
+                        "amount_in_counter": False,
+                    },
+                ) as responce:
+                    result = await responce.json()
 
-        return r.json()
+        return result

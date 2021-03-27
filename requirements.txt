@@ -1,3 +1,4 @@
 yfinance
 statsmodels
 websocket_client
+aiohttp

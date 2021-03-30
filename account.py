@@ -5,10 +5,11 @@ import time
 
 
 class Account:
-    def __init__(self, auth, customer_id, logger):
+    def __init__(self, auth, customer_id, logger, mode):
         self.auth = auth
         self.customer_id = customer_id
         self.logger = logger
+        self.mode = mode
 
     @property
     async def balance(self):
@@ -33,6 +34,10 @@ class Account:
                 return await responce.json()
 
     async def order(self, side, currency_pair, amount):
+
+        if self.mode == "DEV":
+            return f"{side} {amount} {currency_pair}"
+
         _url = f"https://www.bitstamp.net/api/v2/{side}/instant/{currency_pair}/"
 
         nonce = int(time.time() * 1000)

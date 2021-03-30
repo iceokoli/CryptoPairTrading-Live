@@ -20,9 +20,9 @@ class PairsStrategy:
 
     @property
     async def in_position(self):
-        if self.cycle == 1 or self.execute == 1:
-            self.logger.info("Retrieving Balance ....")
-            self.balance = await self.account.balance
+
+        self.logger.info("Retrieving Balance ....")
+        self.balance = await self.account.balance
         self.logger.info(
             "checked balance, btc:{}, eth:{}".format(
                 self.balance["btc_balance"], self.balance["eth_balance"]

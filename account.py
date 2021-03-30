@@ -10,9 +10,16 @@ class Account:
         self.customer_id = customer_id
         self.logger = logger
         self.mode = mode
+        self.balanced_checked = None
+        self.balance_cache = None
 
     @property
     async def balance(self):
+
+        if self.balanced_checked and (time.time() - self.balanced_checked) < 10:
+            self.logger.info("Returning cached balance")
+            return self.balance_cache
+
         _url = "https://www.bitstamp.net/api/v2/balance/"
 
         nonce = int(time.time() * 1000)
@@ -31,7 +38,12 @@ class Account:
                 _url,
                 data={"key": self.auth["key"], "signature": signature, "nonce": nonce},
             ) as responce:
-                return await responce.json()
+                self.balanced_checked = time.time()
+                result = await responce.json()
+
+        self.balance_cache = result
+
+        return result
 
     async def order(self, side, currency_pair, amount):
 

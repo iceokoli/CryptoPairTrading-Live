@@ -40,15 +40,10 @@ class PairsStrategy:
     def reversed(self, spread):
 
         if float(self.balance["eth_balance"]) == 0 and spread >= self.enter:
-
             return True
-
         elif float(self.balance["btc_balance"]) == 0 and spread <= -self.enter:
-
             return True
-
         else:
-
             return False
 
     async def evaluate_action(self, spread):

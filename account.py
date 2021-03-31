@@ -5,7 +5,7 @@ import time
 
 
 class Account:
-    def __init__(self, auth, customer_id, logger, mode):
+    def __init__(self, auth, customer_id, logger, mode) -> None:
         self.auth = auth
         self.customer_id = customer_id
         self.logger = logger
@@ -14,7 +14,7 @@ class Account:
         self.balance_cache = None
 
     @property
-    async def balance(self):
+    async def balance(self) -> dict:
 
         if self.balanced_checked and (time.time() - self.balanced_checked) < 10:
             self.logger.info("Returning cached balance")
@@ -45,7 +45,7 @@ class Account:
 
         return result
 
-    async def order(self, side, currency_pair, amount):
+    async def order(self, side, currency_pair, amount) -> str:
 
         if self.mode == "DEV":
             return f"{side} {amount} {currency_pair}"

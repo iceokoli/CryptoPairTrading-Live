@@ -1,5 +1,5 @@
 class PairsStrategy:
-    def __init__(self, account, enter_trigger, exit_trigger, agg_data, logger):
+    def __init__(self, account, enter_trigger, exit_trigger, agg_data, logger) -> None:
         self.account = account
         self.enter = enter_trigger
         self.exit = exit_trigger
@@ -10,7 +10,7 @@ class PairsStrategy:
         self.balance = 0
         self.execute = 0
 
-    def calc_spread(self, btc_price, eth_price):
+    def calc_spread(self, btc_price, eth_price) -> float:
 
         self.cycle += 1
         spread = btc_price - self.agg_data["beta"] * eth_price
@@ -19,7 +19,7 @@ class PairsStrategy:
         return norm_spread
 
     @property
-    async def in_position(self):
+    async def in_position(self) -> bool:
 
         self.logger.info("Retrieving Balance ....")
         self.balance = await self.account.balance
@@ -37,7 +37,7 @@ class PairsStrategy:
         else:
             return False
 
-    def reversed(self, spread):
+    def reversed(self, spread) -> bool:
 
         if float(self.balance["eth_balance"]) == 0 and spread >= self.enter:
             return True
@@ -46,7 +46,7 @@ class PairsStrategy:
         else:
             return False
 
-    async def evaluate_action(self, spread):
+    async def evaluate_action(self, spread) -> None:
 
         self.logger.info("Spread: {:.2f}".format(spread))
 

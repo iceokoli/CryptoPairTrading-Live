@@ -27,7 +27,7 @@ class Engine:
         elif channel == "order_book_ethgbp":
             self.cache["eth_mid"] = mid
 
-    async def on_open(self, ws):
+    async def on_open(self, ws) -> None:
         btc_sub = json.dumps(
             {"event": "bts:subscribe", "data": {"channel": "order_book_btcgbp"}}
         )
@@ -59,7 +59,7 @@ class Engine:
             if eth_mid and btc_mid:
                 s = strat.calc_spread(btc_mid, eth_mid)
                 await strat.evaluate_action(s)
-                btc_mid, eth_mid = float(), float()
+                self.cache = {"btc_mid": float(), "eth_mid": float()}
 
         except Exception as error:
             self.logger.info(error)

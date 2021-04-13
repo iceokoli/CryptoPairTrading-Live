@@ -27,17 +27,6 @@ class Engine:
         elif channel == "order_book_ethgbp":
             self.cache["eth_mid"] = mid
 
-    async def on_open(self, ws) -> None:
-        btc_sub = json.dumps(
-            {"event": "bts:subscribe", "data": {"channel": "order_book_btcgbp"}}
-        )
-        eth_sub = json.dumps(
-            {"event": "bts:subscribe", "data": {"channel": "order_book_ethgbp"}}
-        )
-        await ws.send_str(btc_sub)
-        await ws.send_str(eth_sub)
-        self.logger.info("### subscribed ###")
-
     async def on_message(self, ws, message) -> None:
 
         try:
@@ -68,7 +57,7 @@ class Engine:
     async def run(self) -> None:
 
         async with aiohttp.ClientSession() as session:
-            async with session.ws_connect(self.feed) as ws:
-                await self.on_open(ws)
+            async with session.ws_connect(self.feed.url) as ws:
+                await self.feed.on_open(ws)
                 async for msg in ws:
                     await self.on_message(ws, msg)

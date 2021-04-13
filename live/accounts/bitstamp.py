@@ -4,7 +4,7 @@ import hashlib
 import time
 
 
-class Account:
+class BitstampAccount:
     def __init__(self, auth, customer_id, logger, mode) -> None:
         self.auth = auth
         self.customer_id = customer_id

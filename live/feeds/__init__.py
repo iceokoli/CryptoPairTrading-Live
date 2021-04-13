@@ -1,0 +1,1 @@
+from .bitstamp import BitstampDataFeed

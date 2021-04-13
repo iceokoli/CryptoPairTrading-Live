@@ -7,9 +7,9 @@ import sys
 from pathlib import Path
 from argparse import ArgumentParser
 
-from account import Account
-from strategy import PairsStrategy
-from engine import Engine
+from live.accounts import BitstampAccount
+from live.feeds import BitstampDataFeed
+from live import PairsStrategy, Engine
 
 
 def configure_logger(dir) -> logging.Logger:
@@ -34,14 +34,15 @@ def handle_input() -> str:
 
     parser = ArgumentParser()
     parser.add_argument("--mode", required=True, choices=["DEV", "PROD"])
+    parser.add_argument("--exchange", required=True, choices=["Bitstamp", "Binance"])
     args = parser.parse_args()
 
-    return args.mode
+    return args.mode, args.exchange
 
 
 def get_prerequesite_data(dir) -> dict:
 
-    with open(f"{dir}/aggregates.json", "r") as f:
+    with open(f"{dir}/pretrade/aggregates.json", "r") as f:
         return json.load(f)
 
 
@@ -50,23 +51,26 @@ if __name__ == "__main__":
     dir = str(Path(__file__).parent)
 
     logger = configure_logger(dir)
-    mode = handle_input()
-
-    client_id = os.getenv("BSID")
-    auth = {
-        "secret": bytes(os.getenv("BSSECRET"), "utf-8"),
-        "key": os.getenv("BSKEY"),
-    }
-    data_feed = "wss://ws.bitstamp.net/"
+    mode, exchange = handle_input()
 
     agg = get_prerequesite_data(dir)
 
-    acc = Account(auth, client_id, logger, mode)
-    strat = PairsStrategy(
-        account=acc, enter_trigger=1, exit_trigger=0.1, agg_data=agg, logger=logger
-    )
-    eng = Engine(data_feed, strat, logger)
+    if exchange == "Bitstamp":
+        client_id = os.getenv("BSID")
+        auth = {
+            "secret": bytes(os.getenv("BSSECRET"), "utf-8"),
+            "key": os.getenv("BSKEY"),
+        }
+        data_feed = BitstampDataFeed(logger)
+        acc = BitstampAccount(auth, client_id, logger, mode)
+        strat = PairsStrategy(
+            account=acc, enter_trigger=1, exit_trigger=0.1, agg_data=agg, logger=logger
+        )
+    elif exchange == "Binance":
+        logger.info("Binance exchange not set up yet")
+        quit()
 
+    eng = Engine(data_feed, strat, logger)
     loop = asyncio.get_event_loop()
     loop.create_task(eng.run())
     loop.run_forever()

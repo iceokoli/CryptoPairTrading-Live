@@ -2,3 +2,4 @@ yfinance
 statsmodels
 websocket_client
 aiohttp
+python-binance

@@ -1,5 +1,7 @@
 class PairsStrategy:
-    def __init__(self, account, enter_trigger, exit_trigger, agg_data, logger) -> None:
+    def __init__(
+        self, account, enter_trigger, exit_trigger, agg_data, logger, margin
+    ) -> None:
         self.account = account
         self.enter = enter_trigger
         self.exit = exit_trigger
@@ -9,6 +11,7 @@ class PairsStrategy:
         self.logger = logger
         self.balance = 0
         self.execute = 0
+        self.margin = margin
 
     def calc_spread(self, btc_price, eth_price) -> float:
 
@@ -29,6 +32,16 @@ class PairsStrategy:
             )
         )
 
+        if self.margin:
+            return await self._in_position_margin()
+        else:
+            return await self._in_position_nomargin()
+
+    async def _in_position_margin(self) -> bool:
+        pass
+
+    async def _in_position_nomargin(self) -> bool:
+
         if (
             float(self.balance["btc_balance"]) < 1e-5
             or float(self.balance["eth_balance"]) < 1e-4
@@ -39,12 +52,39 @@ class PairsStrategy:
 
     def reversed(self, spread) -> bool:
 
+        if self.margin:
+            return self._reversed_margin(spread)
+        else:
+            return self._reversed_nomargin(spread)
+
+    def _reversed_nomargin(self, spread) -> bool:
+
         if float(self.balance["eth_balance"]) == 0 and spread >= self.enter:
             return True
         elif float(self.balance["btc_balance"]) == 0 and spread <= -self.enter:
             return True
         else:
             return False
+
+    def _reversed_margin(self, spread) -> bool:
+        pass
+
+    async def trade(self, long, short) -> None:
+        if self.margin:
+            await self._trade_margin(long, short)
+        else:
+            await self._trade_nomargin(long, short)
+
+    async def _trade_margin(self, long, short):
+        pass
+
+    async def _trade_nomargin(self, long, short) -> None:
+
+        amount = self.balance["f{short}_balance"]
+        direction = "buy" if long + short == "ethbtc" else "sell"
+        txt = await self.account.order(direction, "ethbtc", amount)
+        self.logger.info(txt)
+        self.execute = 1
 
     async def evaluate_action(self, spread) -> None:
 
@@ -67,15 +107,9 @@ class PairsStrategy:
                 self.execute = 0
         else:
             if spread >= self.enter:
-                amount = self.balance["btc_balance"]
-                txt = await self.account.order("buy", "ethbtc", amount)
-                self.logger.info(txt)
-                self.execute = 1
+                self.trade(long="eth", short="btc")
             elif spread <= -self.enter:
-                amount = self.balance["eth_balance"]
-                txt = await self.account.order("sell", "ethbtc", amount)
-                self.logger.info(txt)
-                self.execute = 1
+                self.trade(long="btc", short="eth")
             else:
                 self.logger.info("Do nothing, spread: {:.2f}".format(spread))
                 self.execute = 0

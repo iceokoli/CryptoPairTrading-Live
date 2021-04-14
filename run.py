@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from argparse import ArgumentParser
 
-from live.accounts import BitstampAccount
+from live.accounts import BitstampAccount, BinanceAccount
 from live.feeds import BitstampDataFeed
 from live import PairsStrategy, Engine
 
@@ -63,13 +63,19 @@ if __name__ == "__main__":
         }
         data_feed = BitstampDataFeed(logger)
         acc = BitstampAccount(auth, client_id, logger, mode)
-        strat = PairsStrategy(
-            account=acc, enter_trigger=1, exit_trigger=0.1, agg_data=agg, logger=logger
-        )
     elif exchange == "Binance":
         logger.info("Binance exchange not set up yet")
+        auth = {
+            "secret": os.getenv(f"BSECRET"),
+            "key": os.getenv(f"BKEY"),
+        }
+        acc = BinanceAccount(auth, mode, logger)
+        txt = asyncio.run(acc.balance)
         quit()
 
+    strat = PairsStrategy(
+        account=acc, enter_trigger=1, exit_trigger=0.1, agg_data=agg, logger=logger
+    )
     eng = Engine(data_feed, strat, logger)
     loop = asyncio.get_event_loop()
     loop.create_task(eng.run())

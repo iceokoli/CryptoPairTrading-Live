@@ -61,6 +61,7 @@ if __name__ == "__main__":
             "secret": bytes(os.getenv("BSSECRET"), "utf-8"),
             "key": os.getenv("BSKEY"),
         }
+        margin = None
         data_feed = BitstampDataFeed(logger)
         acc = BitstampAccount(auth, client_id, logger, mode)
     elif exchange == "Binance":
@@ -69,12 +70,18 @@ if __name__ == "__main__":
             "secret": os.getenv(f"BSECRET"),
             "key": os.getenv(f"BKEY"),
         }
+        margin = 3
         acc = BinanceAccount(auth, mode, logger)
         txt = asyncio.run(acc.balance)
         quit()
 
     strat = PairsStrategy(
-        account=acc, enter_trigger=1, exit_trigger=0.1, agg_data=agg, logger=logger
+        account=acc,
+        enter_trigger=1,
+        exit_trigger=0.1,
+        agg_data=agg,
+        logger=logger,
+        margin=margin,
     )
     eng = Engine(data_feed, strat, logger)
     loop = asyncio.get_event_loop()

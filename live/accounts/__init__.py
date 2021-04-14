@@ -1,1 +1,2 @@
-from .bitstamp import BitstampAccount
+from ._bitstamp import BitstampAccount
+from ._binance import BinanceAccount

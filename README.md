@@ -1,5 +1,9 @@
 # CryptoPairTrading-Live
 
+## Context & Back Testing
+
+https://github.com/iceokoli/CryptoPairTrading-BackTest
+
 ## Set up
 
 Deplyed on an AWS EC2 instance
